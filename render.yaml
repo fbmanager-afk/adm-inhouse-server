@@ -2,7 +2,7 @@ services:
   - type: web
     name: adm-inhouse-server
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: echo ready
     startCommand: python app.py
     envVars:
       - key: GITHUB_TOKEN
@@ -11,5 +11,7 @@ services:
         sync: false
       - key: GITHUB_REPO
         value: adm-intel
+      - key: ANTHROPIC_API_KEY
+        sync: false
       - key: PORT
         value: 8080
