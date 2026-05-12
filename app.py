@@ -88,12 +88,22 @@ def inject_html(html,data,guests):
     mod=str(data.get("mod",""))
     if mod:html=re.sub(r"MOD:'[^']*'","MOD:'"+mod+"'",html,count=1)
     ayb=str(data.get("ayb",""))
-    if ayb:html=re.sub(r"AyB:'[^']*'","AyB:'"+ayb+"'",html,count=1)
+    if ayb:html=re.sub(r"'A&B':'[^']*'","'A&B':'"+ayb+"'",html,count=1)
     acts=json.dumps(data.get("actividades",[]),ensure_ascii=True)
     html=re.sub(r"actividades:\[[^\]]*\]","actividades:"+acts,html,count=1)
     if guests:
         gj=json.dumps(guests,ensure_ascii=True)
-        html=re.sub(r"(guests:\s*)\[.*?\](\s*\n\};)",lambda m:m.group(1)+gj+m.group(2),html,count=1,flags=re.DOTALL)
+        idx=html.find('guests:')
+        if idx!=-1:
+            start=html.find('[',idx)
+            if start!=-1:
+                depth=0;end=start
+                for i,c in enumerate(html[start:],start):
+                    if c=='[':depth+=1
+                    elif c==']':
+                        depth-=1
+                        if depth==0:end=i;break
+                html=html[:start]+gj+html[end+1:]
     if fecha:html=re.sub(r"In-House HOY [^\n<]{5,30}","In-House HOY - "+fecha,html)
     ts=datetime.now().strftime("%Y%m%d%H%M%S")
     html=re.sub(r"<!-- (adm|ts)[^>]*-->","<!-- ts:"+ts+" -->",html,count=1)
